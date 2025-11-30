@@ -36,7 +36,7 @@ def parse_args():
                         help='log directory',
                         type=str,
                         default='runs/')
-    parser.add_argument('--weights', nargs='+', type=str, default='/media/jiao/39b48156-5afd-4cd7-bddc-f6ecf4631a79/zhanjiao/workspace/YOLOPX-main/weights/epoch-195.pth', help='model.pth path(s)')
+    parser.add_argument('--weights', nargs='+', type=str, default='/Users/jochem/Documents/GitHub/LightSB_YOLO/models/YOLOPX/weights/epoch-195.pth', help='model.pth path(s)')
     parser.add_argument('--conf_thres', type=float, default=0.001, help='object confidence threshold')
     parser.add_argument('--iou_thres', type=float, default=0.6, help='IOU threshold for NMS')
     args = parser.parse_args()
@@ -67,8 +67,11 @@ def main():
     # start_time = time.time()
     print("begin to bulid up model...")
     # DP mode
-    device = select_device(logger, batch_size=cfg.TEST.BATCH_SIZE_PER_GPU* len(cfg.GPUS)) if not cfg.DEBUG \
-        else select_device(logger, 'cpu')
+    if torch.backends.mps.is_available():
+        device = select_device(logger, 'mps')
+    else:
+        device = select_device(logger, batch_size=cfg.TEST.BATCH_SIZE_PER_GPU* len(cfg.GPUS)) if not cfg.DEBUG \
+            else select_device(logger, 'cpu')
     # device = select_device(logger, 'cpu')
 
     model = get_net(cfg)
@@ -83,7 +86,7 @@ def main():
     model_dict = model.state_dict()
     checkpoint_file = args.weights
     logger.info("=> loading checkpoint '{}'".format(checkpoint_file))
-    checkpoint = torch.load(checkpoint_file)
+    checkpoint = torch.load(checkpoint_file, map_location=device)
     checkpoint_dict = checkpoint['state_dict']
     # checkpoint_dict = {k: v for k, v in checkpoint['state_dict'].items() if k.split(".")[1] in det_idx_range}
     model_dict.update(checkpoint_dict)

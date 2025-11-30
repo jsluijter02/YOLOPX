@@ -6,7 +6,7 @@ _C = CN()
 
 _C.LOG_DIR =  'runs/'
 _C.GPUS = (0,)     # 显卡数 = len(GPUS)
-_C.WORKERS = 8      # 指数据装载时cpu所使用的线程数，默认为8（注意，一般默使用8的话，会报错~~。原因是爆系统内存）
+_C.WORKERS = 0     # 指数据装载时cpu所使用的线程数，默认为8（注意，一般默使用8的话，会报错~~。原因是爆系统内存）
 _C.PIN_MEMORY = True
 _C.PRINT_FREQ = 2150
 _C.AUTO_RESUME =False       # Resume from the last training interrupt
@@ -55,10 +55,10 @@ _C.LOSS.LL_IOU_GAIN = 0.2 # lane line iou loss gain
 
 # DATASET related params
 _C.DATASET = CN(new_allowed=True)
-_C.DATASET.DATAROOT = '/media/jiao/39b48156-5afd-4cd7-bddc-f6ecf4631a79/zhanjiao/dataset/bdd/bdd100k/images/100k'       # the path of images folder
-_C.DATASET.LABELROOT = '/media/jiao/39b48156-5afd-4cd7-bddc-f6ecf4631a79/zhanjiao/dataset/bdd/bdd100k/labels/100k'      # the path of det_annotations folder
-_C.DATASET.MASKROOT = '/media/jiao/39b48156-5afd-4cd7-bddc-f6ecf4631a79/zhanjiao/dataset/bdd/bdd_seg_gt'                # the path of da_seg_annotations folder
-_C.DATASET.LANEROOT = '/media/jiao/39b48156-5afd-4cd7-bddc-f6ecf4631a79/zhanjiao/dataset/bdd/bdd_lane_gt'               # the path of ll_seg_annotations folder
+_C.DATASET.DATAROOT = '/Users/jochem/Documents/GitHub/LightSB_YOLO/data/images'       # the path of images folder
+_C.DATASET.LABELROOT = '/Users/jochem/Documents/GitHub/LightSB_YOLO/data/det_annotations'      # the path of det_annotations folder
+_C.DATASET.MASKROOT = '/Users/jochem/Documents/GitHub/LightSB_YOLO/data/da_seg_annotations'                 # the path of da_seg_annotations folder
+_C.DATASET.LANEROOT = '/Users/jochem/Documents/GitHub/LightSB_YOLO/data/ll_seg_annotations'                # the path of ll_seg_annotations folder
 _C.DATASET.DATASET = 'BddDataset'
 _C.DATASET.TRAIN_SET = 'train'
 _C.DATASET.TEST_SET = 'val'

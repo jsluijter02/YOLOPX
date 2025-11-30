@@ -50,6 +50,10 @@ def create_logger(cfg, cfg_path, phase='train', rank=-1):
 
 
 def select_device(logger=None, device='', batch_size=None):
+    if device.lower() == 'mps':
+        logger.info('mps device selected')
+        return torch.device('mps')
+    
     # device = 'cpu' or '0' or '0,1,2,3'
     cpu_request = device.lower() == 'cpu'
     if device and not cpu_request:  # if device requested other than 'cpu'

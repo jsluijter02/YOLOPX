@@ -55,10 +55,10 @@ _C.LOSS.LL_IOU_GAIN = 0.2 # lane line iou loss gain
 
 # DATASET related params
 _C.DATASET = CN(new_allowed=True)
-_C.DATASET.DATAROOT = '/Users/jochem/Documents/GitHub/LightSB_YOLO/data/images'       # the path of images folder
-_C.DATASET.LABELROOT = '/Users/jochem/Documents/GitHub/LightSB_YOLO/data/det_annotations'      # the path of det_annotations folder
-_C.DATASET.MASKROOT = '/Users/jochem/Documents/GitHub/LightSB_YOLO/data/da_seg_annotations'                 # the path of da_seg_annotations folder
-_C.DATASET.LANEROOT = '/Users/jochem/Documents/GitHub/LightSB_YOLO/data/ll_seg_annotations'                # the path of ll_seg_annotations folder
+_C.DATASET.DATAROOT = './data/images'       # the path of images folder
+_C.DATASET.LABELROOT = './data/det_annotations'      # the path of det_annotations folder
+_C.DATASET.MASKROOT = './data/da_seg_annotations'                 # the path of da_seg_annotations folder
+_C.DATASET.LANEROOT = './data/ll_seg_annotations'                # the path of ll_seg_annotations folder
 _C.DATASET.DATASET = 'BddDataset'
 _C.DATASET.TRAIN_SET = 'train'
 _C.DATASET.TEST_SET = 'val'
@@ -97,7 +97,7 @@ _C.TRAIN.BEGIN_EPOCH = 0
 _C.TRAIN.END_EPOCH = 200
 
 _C.TRAIN.VAL_FREQ = 20
-_C.TRAIN.BATCH_SIZE_PER_GPU = 32
+_C.TRAIN.BATCH_SIZE_PER_GPU = 8
 _C.TRAIN.SHUFFLE = True
 
 _C.TRAIN.IOU_THRESHOLD = 0.2
@@ -122,7 +122,7 @@ _C.TRAIN.PLOT = False                #
 
 # testing
 _C.TEST = CN(new_allowed=True)
-_C.TEST.BATCH_SIZE_PER_GPU = 32
+_C.TEST.BATCH_SIZE_PER_GPU = 8
 _C.TEST.MODEL_FILE = ''
 _C.TEST.SAVE_JSON = False
 _C.TEST.SAVE_TXT = False
@@ -140,5 +140,17 @@ def update_config(cfg, args):
 
     if args.logDir:
         cfg.LOG_DIR = args.logDir
+
+    if args.da_seg_annotations:
+        cfg.DATASET.MASKROOT = args.da_seg_annotations
+    
+    if args.ll_seg_annotations:
+        cfg.DATASET.LANEROOT = args.ll_seg_annotations
+
+    if args.det_annotations:
+        cfg.DATASET.LABELROOT = args.det_annotations
+
+    if args.images:
+        cfg.DATASET.DATAROOT = args.images
 
     cfg.freeze()

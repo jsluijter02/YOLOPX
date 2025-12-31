@@ -36,7 +36,7 @@ def parse_args():
                         help='log directory',
                         type=str,
                         default='runs/')
-    parser.add_argument('--weights', nargs='+', type=str, default='/Users/jochem/Documents/GitHub/LightSB_YOLO/models/YOLOPX/weights/epoch-195.pth', help='model.pth path(s)')
+    parser.add_argument('--weights', nargs='+', type=str, default='./weights/epoch-195.pth', help='model.pth path(s)')
     parser.add_argument('--conf_thres', type=float, default=0.001, help='object confidence threshold')
     parser.add_argument('--iou_thres', type=float, default=0.6, help='IOU threshold for NMS')
     args = parser.parse_args()
@@ -67,12 +67,8 @@ def main():
     # start_time = time.time()
     print("begin to bulid up model...")
     # DP mode
-    if torch.backends.mps.is_available():
-        device = select_device(logger, 'mps')
-    else:
-        device = select_device(logger, batch_size=cfg.TEST.BATCH_SIZE_PER_GPU* len(cfg.GPUS)) if not cfg.DEBUG \
-            else select_device(logger, 'cpu')
-    # device = select_device(logger, 'cpu')
+    device = select_device(logger, batch_size=cfg.TEST.BATCH_SIZE_PER_GPU* len(cfg.GPUS)) if not cfg.DEBUG \
+        else select_device(logger, 'cpu')
 
     model = get_net(cfg)
     print("finish build model")

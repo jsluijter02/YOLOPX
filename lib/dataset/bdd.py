@@ -57,16 +57,19 @@ class BddDataset(AutoDriveDataset):
                     gt[idx][0] = cls_id
                     box = convert((width, height), (x1, x2, y1, y2))
                     gt[idx][1:] = list(box)
-                
+            
+            timeofday = label['attributes']['timeofday']
 
             rec = [{
                 'image': image_path,
                 'label': gt,
                 'mask': mask_path,
-                'lane': lane_path
+                'lane': lane_path,
+                'timeofday': timeofday
             }]
 
             gt_db += rec
+
         print('database build finish')
         return gt_db
 
@@ -85,3 +88,18 @@ class BddDataset(AutoDriveDataset):
         """  
         """
         pass
+
+    # Filter, based on daytime or night images
+    def select_data(self, timeofday):
+        filtered_db = []
+
+        for data_point in self.db:
+            if data_point['timeofday'] == 'dawn/dusk':
+                continue
+
+            if timeofday == 'all' or data_point['timeofday'] == timeofday:
+                filtered_db.append(data_point)
+        
+        return filtered_db
+            
+

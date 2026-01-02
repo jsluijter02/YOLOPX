@@ -8,9 +8,13 @@ from tqdm import tqdm
 single_cls = True       # just detect vehicle
 
 class BddDataset(AutoDriveDataset):
-    def __init__(self, cfg, is_train, inputsize, transform=None):
+    def __init__(self, cfg, is_train, inputsize, transform=None, skip=False):
         super().__init__(cfg, is_train, inputsize, transform)
-        self.db = self._get_db()
+        if skip:
+            self.db = []
+
+        else:
+            self.db = self._get_db()
         self.cfg = cfg
 
     def _get_db(self):
@@ -85,3 +89,16 @@ class BddDataset(AutoDriveDataset):
         """  
         """
         pass
+
+    # Filter, based on daytime or night images
+    def select_data(self, timeofday):
+        filtered_db = []
+
+        for data_point in self.db:
+            if data_point['timeofday'] == 'dawn/dusk':
+                continue
+
+            if timeofday == 'all' or data_point['timeofday'] == timeofday:
+                filtered_db.append(data_point)
+        
+        return filtered_db

@@ -78,6 +78,10 @@ _C.DATASET.HSV_S = 0.7  # image HSV-Saturation augmentation (fraction)
 _C.DATASET.HSV_V = 0.4  # image HSV-Value augmentation (fraction)
 # TODO: more augmet params to add
 
+## ADDED CLAHE PARAMS
+_C.DATASET.CLAHE_VAL = False          # Apply CLAHE in validation
+_C.DATASET.CLAHE_CLIPLIMIT = 2.0     # CLAHE clip
+
 # train
 _C.TRAIN = CN(new_allowed=True)
 _C.TRAIN.LR0 = 0.001  # initial learning rate (SGD=1E-2, Adam=1E-3)

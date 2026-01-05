@@ -106,6 +106,9 @@ class AutoDriveDataset(Dataset):
 
         self.mosaic_rate = cfg.mosaic_rate
         self.mixup_rate = cfg.mixup_rate
+
+        ## ADDED CODE
+        self.clahe = cv2.createCLAHE(clipLimit=cfg.DATASET.CLAHE_CLIP_LIMIT, tileGridSize=(8,8))
     
     def _get_db(self):
         """
@@ -328,8 +331,12 @@ class AutoDriveDataset(Dataset):
                 seg_label = np.flipud(seg_label)
                 lane_label = np.flipud(lane_label)
         
-        else:
+        else: # So validation
             img, labels, seg_label, lane_label, (h0, w0), (h,w), path = self.load_image(idx)
+
+            ## ADDED CODE 
+            if self.cfg.DATASET.CLAHE_VAL:
+                img = self.apply_clahe(img, clipLimit=self.cfg.DATASET.CLAHE_CLIPLIMIT)
         
         (img, seg_label, lane_label), ratio, pad = letterbox((img, seg_label, lane_label), 640, auto=True, scaleup=self.is_train)
         shapes = (h0, w0), ((h / h0, w / w0), pad)  # for COCO mAP rescaling
@@ -408,4 +415,12 @@ class AutoDriveDataset(Dataset):
 
         return torch.stack(img, 0), [label_det, torch.stack(label_seg, 0), torch.stack(label_lane, 0)], paths, shapes
 
-
+    def apply_clahe(self, img, clipLimit = 2):
+        hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+        h, s, v = cv2.split(hsv)
+        
+        v = self.clahe.apply(v)
+        hsv = cv2.merge((h, s, v))
+        
+        img = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
+        return img

@@ -12,7 +12,6 @@ class BddDataset(AutoDriveDataset):
         super().__init__(cfg, is_train, inputsize, transform)
         if skip:
             self.db = []
-
         else:
             self.db = self._get_db()
         self.cfg = cfg

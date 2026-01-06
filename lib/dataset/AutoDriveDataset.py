@@ -108,7 +108,7 @@ class AutoDriveDataset(Dataset):
         self.mixup_rate = cfg.mixup_rate
 
         ## ADDED CODE
-        self.clahe = cv2.createCLAHE(clipLimit=cfg.DATASET.CLAHE_CLIP_LIMIT, tileGridSize=(8,8))
+        self.clahe = cv2.createCLAHE(clipLimit=cfg.DATASET.CLAHE_CLIPLIMIT, tileGridSize=(8,8))
     
     def _get_db(self):
         """

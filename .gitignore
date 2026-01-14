@@ -1,1 +1,4 @@
 weights/epoch-195.pth
+
+__pycache__/
+*.pyc

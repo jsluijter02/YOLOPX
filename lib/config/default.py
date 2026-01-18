@@ -1,6 +1,9 @@
-import os
+import os, sys
 from yacs.config import CfgNode as CN
 
+path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.getcwd()))))
+sys.path.append(os.path.join(path, "scripts"))
+from scripts.utils import dirs
 
 _C = CN()
 
@@ -55,10 +58,11 @@ _C.LOSS.LL_IOU_GAIN = 0.2 # lane line iou loss gain
 
 # DATASET related params
 _C.DATASET = CN(new_allowed=True)
-_C.DATASET.DATAROOT = './data/images'       # the path of images folder
-_C.DATASET.LABELROOT = './data/det_annotations'      # the path of det_annotations folder
-_C.DATASET.MASKROOT = './data/da_seg_annotations'                 # the path of da_seg_annotations folder
-_C.DATASET.LANEROOT = './data/ll_seg_annotations'                # the path of ll_seg_annotations folder
+data_dir = dirs.get_bdd_dir()
+_C.DATASET.DATAROOT = os.path.join(data_dir, "images")      # the path of images folder
+_C.DATASET.LABELROOT = os.path.join(data_dir, "det_annotations")   # the path of det_annotations folder
+_C.DATASET.MASKROOT = os.path.join(data_dir, "da_seg_annotations") # the path of da_seg_annotations folder
+_C.DATASET.LANEROOT = os.path.join(data_dir, "ll_seg_annotations")             # the path of ll_seg_annotations folder
 _C.DATASET.DATASET = 'BddDataset'
 _C.DATASET.TRAIN_SET = 'train'
 _C.DATASET.TEST_SET = 'val'

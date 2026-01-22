@@ -113,7 +113,7 @@ def train(cfg, train_loader, model, criterion, optimizer, scaler, epoch, num_bat
 
 
 def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir,
-             tb_log_dir, writer_dict=None, logger=None, device='cpu', rank=-1):
+             tb_log_dir, writer_dict=None, logger=None, device='cpu', rank=-1, save_error_plots = False):
     """
     validata
 
@@ -343,6 +343,25 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
                                 correct[pi[j]] = ious[j] > iouv  # iou_thres is 1xn
                                 if len(detected) == nl:  # all targets already located in image
                                     break
+            
+            # ADDED CODE          
+            # num ground truth = nl
+            # tp = number of correct = 1 at mAP0.5
+            # fp = number of correct = 0
+            # fn = number of gt: nl - number of correct: tp
+            # see if we want to visualise these error cases
+            
+            tp = int(correct[:,0].sum())
+
+            fp = len(correct[:,0]) - tp
+            fn = nl - tp
+
+            how_bad_exactly = fp + fn
+
+            if save_error_plots and how_bad_exactly > 0:
+                pass
+                
+
 
             # Append statistics (correct, conf, pcls, tcls)
             stats.append((correct.cpu(), pred[:, 4].cpu(), pred[:, 5].cpu(), tcls))
@@ -352,6 +371,7 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
             #Thread(target=plot_images, args=(img, target[0], paths, f, names), daemon=True).start()
             f = save_dir +'/'+ f'test_batch{batch_i}_pred.jpg'  # predictions
             #Thread(target=plot_images, args=(img, output_to_target(output), paths, f, names), daemon=True).start()
+            
 
     # Compute statistics
     # stats : [[all_img_correct]...[all_img_tcls]]

@@ -208,40 +208,40 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
 
             inf_out,train_out = det_out
             
-            #driving area segment evaluation
-            _,da_predict=torch.max(da_seg_out, 1)
-            _,da_gt=torch.max(target[1], 1)
-            da_predict = da_predict[:, pad_h:height-pad_h, pad_w:width-pad_w]
-            da_gt = da_gt[:, pad_h:height-pad_h, pad_w:width-pad_w]
+            # #driving area segment evaluation
+            # _,da_predict=torch.max(da_seg_out, 1)
+            # _,da_gt=torch.max(target[1], 1)
+            # da_predict = da_predict[:, pad_h:height-pad_h, pad_w:width-pad_w]
+            # da_gt = da_gt[:, pad_h:height-pad_h, pad_w:width-pad_w]
 
-            da_metric.reset()
-            da_metric.addBatch(da_predict.cpu(), da_gt.cpu())
-            da_acc = da_metric.pixelAccuracy()
-            da_IoU = da_metric.IntersectionOverUnion()
-            da_mIoU = da_metric.meanIntersectionOverUnion()
+            # da_metric.reset()
+            # da_metric.addBatch(da_predict.cpu(), da_gt.cpu())
+            # da_acc = da_metric.pixelAccuracy()
+            # da_IoU = da_metric.IntersectionOverUnion()
+            # da_mIoU = da_metric.meanIntersectionOverUnion()
 
-            da_acc_seg.update(da_acc,img.size(0))
-            da_IoU_seg.update(da_IoU,img.size(0))
-            da_mIoU_seg.update(da_mIoU,img.size(0))
+            # da_acc_seg.update(da_acc,img.size(0))
+            # da_IoU_seg.update(da_IoU,img.size(0))
+            # da_mIoU_seg.update(da_mIoU,img.size(0))
 
-            #lane line segment evaluation
-            _,ll_predict=torch.max(ll_seg_out, 1)
-            _,ll_gt=torch.max(target[2], 1)
-            ll_predict = ll_predict[:, pad_h:height-pad_h, pad_w:width-pad_w]
-            ll_gt = ll_gt[:, pad_h:height-pad_h, pad_w:width-pad_w]
+            # #lane line segment evaluation
+            # _,ll_predict=torch.max(ll_seg_out, 1)
+            # _,ll_gt=torch.max(target[2], 1)
+            # ll_predict = ll_predict[:, pad_h:height-pad_h, pad_w:width-pad_w]
+            # ll_gt = ll_gt[:, pad_h:height-pad_h, pad_w:width-pad_w]
 
-            ll_metric.reset()
-            ll_metric.addBatch(ll_predict.cpu(), ll_gt.cpu())
-            ll_acc = ll_metric.lineAccuracy()
-            ll_IoU = ll_metric.IntersectionOverUnion()
-            ll_mIoU = ll_metric.meanIntersectionOverUnion()
+            # ll_metric.reset()
+            # ll_metric.addBatch(ll_predict.cpu(), ll_gt.cpu())
+            # ll_acc = ll_metric.lineAccuracy()
+            # ll_IoU = ll_metric.IntersectionOverUnion()
+            # ll_mIoU = ll_metric.meanIntersectionOverUnion()
 
-            ll_acc_seg.update(ll_acc,img.size(0))
-            ll_IoU_seg.update(ll_IoU,img.size(0))
-            ll_mIoU_seg.update(ll_mIoU,img.size(0))
+            # ll_acc_seg.update(ll_acc,img.size(0))
+            # ll_IoU_seg.update(ll_IoU,img.size(0))
+            # ll_mIoU_seg.update(ll_mIoU,img.size(0))
             
-            total_loss, head_losses = criterion((train_out,da_seg_out,ll_seg_out), target, shapes,model, img )   #Compute loss
-            losses.update(total_loss.item(), img.size(0))
+            # total_loss, head_losses = criterion((train_out,da_seg_out,ll_seg_out), target, shapes,model, img )   #Compute loss
+            # losses.update(total_loss.item(), img.size(0))
 
             #NMS         
             t = time_synchronized()
@@ -351,15 +351,15 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
             # fn = number of gt: nl - number of correct: tp
             # see if we want to visualise these error cases
             
-            tp = int(correct[:,0].sum())
+            # tp = int(correct[:,0].sum())
 
-            fp = len(correct[:,0]) - tp
-            fn = nl - tp
+            # fp = len(correct[:,0]) - tp
+            # fn = nl - tp
 
-            how_bad_exactly = fp + fn
+            # how_bad_exactly = fp + fn
 
-            if save_error_plots and how_bad_exactly > 0:
-                pass
+            # if save_error_plots and how_bad_exactly > 0:
+            #     pass
                 
 
 
@@ -444,8 +444,8 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
     for i, c in enumerate(ap_class):
         maps[c] = ap[i]
 
-    da_segment_result = (da_acc_seg.avg,da_IoU_seg.avg,da_mIoU_seg.avg)
-    ll_segment_result = (ll_acc_seg.avg,ll_IoU_seg.avg,ll_mIoU_seg.avg)
+    # da_segment_result = (da_acc_seg.avg,da_IoU_seg.avg,da_mIoU_seg.avg)
+    # ll_segment_result = (ll_acc_seg.avg,ll_IoU_seg.avg,ll_mIoU_seg.avg)
 
     # print(da_segment_result)
     # print(ll_segment_result)
@@ -453,8 +453,8 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
     # print('mp:{},mr:{},map50:{},map:{}'.format(mp, mr, map50, map))
     #print segmet_result
     t = [T_inf.avg, T_nms.avg]
-    return da_segment_result, ll_segment_result, detect_result, losses.avg, maps, t
-        
+    # return da_segment_result, ll_segment_result, detect_result, losses.avg, maps, t
+    return None , None , detect_result, None, maps, t
 
 
 class AverageMeter(object):

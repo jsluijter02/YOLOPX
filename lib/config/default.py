@@ -6,8 +6,8 @@ sys.path.append(os.path.join(path, "scripts"))
 from scripts.utils import dirs
 
 _C = CN()
-
-_C.LOG_DIR =  'runs/'
+_C.OUTPUT_DIR = os.path.join(dirs.get_base_dir(), "results")
+_C.LOG_DIR =  os.path.join(_C.OUTPUT_DIR, "logs")
 _C.GPUS = (0,)     # 显卡数 = len(GPUS)
 _C.WORKERS = 0     # 指数据装载时cpu所使用的线程数，默认为8（注意，一般默使用8的话，会报错~~。原因是爆系统内存）
 _C.PIN_MEMORY = True
@@ -58,11 +58,11 @@ _C.LOSS.LL_IOU_GAIN = 0.2 # lane line iou loss gain
 
 # DATASET related params
 _C.DATASET = CN(new_allowed=True)
-data_dir = dirs.get_bdd_dir()
-_C.DATASET.DATAROOT = os.path.join(data_dir, "images")      # the path of images folder
-_C.DATASET.LABELROOT = os.path.join(data_dir, "det_annotations")   # the path of det_annotations folder
-_C.DATASET.MASKROOT = os.path.join(data_dir, "da_seg_annotations") # the path of da_seg_annotations folder
-_C.DATASET.LANEROOT = os.path.join(data_dir, "ll_seg_annotations")             # the path of ll_seg_annotations folder
+bdd_dir = dirs.get_bdd_dir()
+_C.DATASET.DATAROOT = os.path.join(dirs.get_data_dir(), "images")      # the path of images folder
+_C.DATASET.LABELROOT = os.path.join(bdd_dir, "det_annotations")   # the path of det_annotations folder
+_C.DATASET.MASKROOT = os.path.join(bdd_dir, "da_seg_annotations") # the path of da_seg_annotations folder
+_C.DATASET.LANEROOT = os.path.join(bdd_dir, "ll_seg_annotations")             # the path of ll_seg_annotations folder
 _C.DATASET.DATASET = 'BddDataset'
 _C.DATASET.TRAIN_SET = 'train'
 _C.DATASET.TEST_SET = 'val'
@@ -133,10 +133,13 @@ _C.TEST = CN(new_allowed=True)
 _C.TEST.BATCH_SIZE_PER_GPU = 8
 _C.TEST.MODEL_FILE = ''
 _C.TEST.SAVE_JSON = False
-_C.TEST.SAVE_TXT = False
+_C.TEST.SAVE_TXT = True
 _C.TEST.PLOTS = False
-_C.TEST.NMS_CONF_THRESHOLD  = 0.001
+_C.TEST.NMS_CONF_THRESHOLD  = 0.25
 _C.TEST.NMS_IOU_THRESHOLD  = 0.6
+
+## Added metrics p image saving
+_C.METRICS_PER_IMAGE = True
 
 
 def update_config(cfg, args):

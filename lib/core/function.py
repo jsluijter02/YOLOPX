@@ -131,9 +131,9 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
     max_stride = 32
     weights = None
 
-    save_dir = output_dir + os.path.sep + 'visualization'
-    if not os.path.exists(save_dir):
-        os.mkdir(save_dir)
+    save_dir = os.path.join(output_dir, 'predictions')
+    os.makedirs(save_dir, exist_ok=True)
+    img_metrics = {}
 
     # print(save_dir)
     _, imgsz = [check_img_size(x, s=max_stride) for x in config.MODEL.IMAGE_SIZE] #imgsz is multiple of max_stride
@@ -141,7 +141,7 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
     test_batch_size = config.TEST.BATCH_SIZE_PER_GPU * len(config.GPUS)
     training = False
     is_coco = False #is coco dataset
-    save_conf=False # save auto-label confidences
+    save_conf=True # save auto-label confidences
     verbose=False
     save_hybrid=False
     log_imgs,wandb = min(16,100), None
@@ -186,6 +186,8 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
     jdict, stats, ap, ap_class, wandb_images = [], [], [], [], []
 
     for batch_i, (img, target, paths, shapes) in tqdm(enumerate(val_loader), total=len(val_loader)):
+        if batch_i == 3:
+            break
         if not config.DEBUG:
             img = img.to(device, non_blocking=True)
             assign_target = []
@@ -285,7 +287,9 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
                 for *xyxy, conf, cls in predn.tolist():
                     xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                     line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format
-                    with open(save_dir / 'labels' / (path.stem + '.txt'), 'a') as f:
+                    txt_path = os.path.join(save_dir, 'labels', (path.stem + '.txt'))
+                    os.makedirs(os.path.dirname(txt_path), exist_ok=True)
+                    with open(txt_path, 'a') as f:
                         f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
             # W&B logging
@@ -353,18 +357,32 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
             
             # tp = int(correct[:,0].sum())
 
-            # fp = len(correct[:,0]) - tp
+            # fp = len(pred) - tp
             # fn = nl - tp
 
             # how_bad_exactly = fp + fn
 
             # if save_error_plots and how_bad_exactly > 0:
             #     pass
-                
+            
 
 
             # Append statistics (correct, conf, pcls, tcls)
             stats.append((correct.cpu(), pred[:, 4].cpu(), pred[:, 5].cpu(), tcls))
+        
+            if config.METRICS_PER_IMAGE:
+                tp = int(correct[:,0].sum()) 
+                fp = len(pred) - tp
+                fn = nl - tp
+                img_metrics[path.name] = {
+                    'tp': tp,
+                    'fp': fp,
+                    'fn': fn,
+                    'precision': tp/(tp+fp) if (tp+fp) > 0 else 0,
+                    'recall': tp/(tp+fn) if (tp+fn) > 0 else 0,
+                    'f1': 2*tp/(2*tp+fp+fn) if (2*tp+fp+fn) > 0 else 0,
+                    'num_gt': nl
+                }
 
         if config.TEST.PLOTS and batch_i < 3:
             f = save_dir +'/'+ f'test_batch{batch_i}_labels.jpg'  # labels
@@ -435,9 +453,16 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
         except Exception as e:
             print(f'pycocotools unable to run: {e}')
 
+    if config.METRICS_PER_IMAGE:
+        metrics_save_path = os.path.join(save_dir, 'metrics.json')
+        with open(metrics_save_path, 'w') as f:
+            json.dump(img_metrics, f, indent=4)
+
     # Return results
     if not training:
-        s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if config.TEST.SAVE_TXT else ''
+        labels_dir = os.path.join(save_dir, 'labels')
+        num = len(os.listdir(labels_dir))
+        s = f"\n{num} labels saved to {labels_dir}" if config.TEST.SAVE_TXT else ''
         print(f"Results saved to {save_dir}{s}")
     model.float()  # for training
     maps = np.zeros(nc) + map

@@ -10,6 +10,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from lib.models.common import Conv, DWConv, GhostConv, RepConv
+from scripts.utils.device import get_device
 
 def meshgrid(*tensors):
         return torch.meshgrid(*tensors)
@@ -192,8 +193,8 @@ class YOLOXHead(nn.Module):
             shape = grid.shape[:2]
             strides.append(torch.full((*shape, 1), stride))
 
-        grids = torch.cat(grids, dim=1).type(dtype)
-        strides = torch.cat(strides, dim=1).type(dtype)
+        grids = torch.cat(grids, dim=1).to(device=outputs.device, dtype=outputs.dtype)#.type(dtype)
+        strides = torch.cat(strides, dim=1).to(device=outputs.device, dtype=outputs.dtype)#.type(dtype)
 
         outputs[..., :2] = (outputs[..., :2] + grids) * strides # xy投影到输入图像
         outputs[..., 2:4] = torch.exp(outputs[..., 2:4]) * strides # wh投影到输入图像

@@ -338,7 +338,7 @@ class AutoDriveDataset(Dataset):
             if self.cfg.DATASET.CLAHE_VAL:
                 img = self.apply_clahe(img, clipLimit=self.cfg.DATASET.CLAHE_CLIPLIMIT)
         
-        (img, seg_label, lane_label), ratio, pad = letterbox((img, seg_label, lane_label), 640, auto=True, scaleup=self.is_train)
+        (img, seg_label, lane_label), ratio, pad = letterbox((img, seg_label, lane_label), 640, auto=False, scaleup=self.is_train)
         shapes = (h0, w0), ((h / h0, w / w0), pad)  # for COCO mAP rescaling
 
         if len(labels):

@@ -280,7 +280,7 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
             # Predictions
             predn = pred.clone()
             scale_coords(img[si].shape[1:], predn[:, :4], shapes[si][0], shapes[si][1])  # native-space pred
-
+            
             # Append to text file
             if config.TEST.SAVE_TXT:
                 gn = torch.tensor(shapes[si][0])[[1, 0, 1, 0]]  # normalization gain whwh
@@ -461,6 +461,7 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
     # Return results
     if not training:
         labels_dir = os.path.join(save_dir, 'labels')
+        os.makedirs(labels_dir, exist_ok=True)
         num = len(os.listdir(labels_dir))
         s = f"\n{num} labels saved to {labels_dir}" if config.TEST.SAVE_TXT else ''
         print(f"Results saved to {save_dir}{s}")

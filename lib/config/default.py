@@ -130,7 +130,7 @@ _C.TRAIN.PLOT = False                #
 
 # testing
 _C.TEST = CN(new_allowed=True)
-_C.TEST.BATCH_SIZE_PER_GPU = 8
+_C.TEST.BATCH_SIZE_PER_GPU = 4
 _C.TEST.MODEL_FILE = ''
 _C.TEST.SAVE_JSON = False
 _C.TEST.SAVE_TXT = True

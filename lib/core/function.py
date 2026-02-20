@@ -282,13 +282,17 @@ def validate(epoch,config, val_loader, val_dataset, model, criterion, output_dir
             # Append to text file
             if config.TEST.SAVE_TXT:
                 gn = torch.tensor(shapes[si][0])[[1, 0, 1, 0]]  # normalization gain whwh
+
+                lines = []
                 for *xyxy, conf, cls in predn.tolist():
                     xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                     line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format
-                    txt_path = os.path.join(save_dir, 'labels', (path.stem + '.txt'))
-                    os.makedirs(os.path.dirname(txt_path), exist_ok=True)
-                    with open(txt_path, 'a') as f:
-                        f.write(('%g ' * len(line)).rstrip() % line + '\n')
+                    lines.append(('%g ' * len(line)).rstrip() % line + '\n')
+
+                txt_path = os.path.join(save_dir, 'labels', (path.stem + '.txt'))
+                os.makedirs(os.path.dirname(txt_path), exist_ok=True)
+                with open(txt_path, 'w') as f:
+                    f.writelines(lines)
 
             # W&B logging
             if config.TEST.PLOTS and len(wandb_images) < log_imgs:
